@@ -1,0 +1,38 @@
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+
+description = "ELKI - Parent Project"
+eclipse.project.name = 'elki-project'
+
+allprojects  {
+  apply plugin: 'java-library'
+  apply plugin: 'maven-publish' // Not strictly necessary, but convenient
+  repositories { jcenter(); }
+
+  group = 'de.lmu.ifi.dbs.elki'
+  version = '0.7.5'
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+  compileJava.options.encoding = 'UTF-8'
+
+  ext.vendor = "ELKI Development Team"
+  ext.url = "https://elki-project.github.io/"
+  ext.year = new Date().format('yyyy')
+
+  ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
+  ext.isSnapshot = version.endsWith("-SNAPSHOT")
+  ext.needsSigning = !ext.isSnapshot
+
+  // For tests depending on other module's tests
+  configurations { testOutput.extendsFrom testCompile }
+}
+
+apply from: 'gradle/modules.gradle'
+apply from: 'gradle/package.gradle'
+apply from: 'gradle/javadoc.gradle'
+apply from: 'gradle/jacoco.gradle'
+apply from: 'gradle/eclipse.gradle'
+apply from: 'gradle/dependencyPlot.gradle'
+apply from: 'gradle/signing.gradle'
+

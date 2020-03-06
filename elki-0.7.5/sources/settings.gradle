@@ -1,0 +1,50 @@
+rootProject.name = "ELKI"
+
+def module(m, d=null) {
+  include ":$m"
+  if (!d) d = m
+  project(":$m").projectDir = "$rootDir/$d" as File
+}
+
+module 'elki-logging'
+module 'elki-core-api'
+module 'elki-core-math'
+module 'elki-core-util'
+module 'elki-core-data'
+module 'elki-core-distance'
+module 'elki-core-dbids'
+module 'elki-core-dbids-int'
+module 'elki-core-parallel'
+module 'elki-core'
+module 'elki-database'
+module 'elki-input'
+module 'elki-clustering'
+module 'elki-outlier'
+module 'elki-itemsets'
+module 'elki-classification'
+module 'elki-timeseries'
+module 'elki-data-generator'
+module 'elki-persistent'
+module 'elki-index'
+module 'elki-index-preprocessed'
+module 'elki-index-rtree'
+module 'elki-index-mtree'
+module 'elki-index-lsh'
+module 'elki-index-various'
+module 'elki-precomputed'
+module 'elki-geo'
+module 'elki-gui-minigui'
+module 'elki-test-core'
+module 'elki'
+module 'elki-docutil'
+// Addons:
+module 'elki-batik-visualization', 'addons/batikvis'
+module 'elki-uncertain', 'addons/uncertain'
+module 'elki-libsvm', 'addons/libsvm'
+// module 'elki-lucene', 'addons/lucene'
+ module 'elki-3dpc', 'addons/3dpc'
+// module 'elki-joglvis', 'addons/joglvis'
+// module 'elki-index-xtree', 'addons/xtree' // Not code reviewed
+module 'elki-tutorial', 'addons/tutorial'
+// Fat-jar bundle
+module 'elki-bundle', 'addons/bundle'

@@ -1,0 +1,6 @@
+description = 'ELKI - Time Series'
+dependencies {
+  compile project(':elki-outlier')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}
+

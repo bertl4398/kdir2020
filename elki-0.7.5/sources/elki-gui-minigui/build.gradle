@@ -1,0 +1,4 @@
+description = 'ELKI - MiniGUI Command Line Builder'
+dependencies {
+  compile project(':elki')
+}

@@ -1,0 +1,6 @@
+description = 'ELKI - Itemset Mining'
+dependencies {
+  compile project(':elki-core')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}
+

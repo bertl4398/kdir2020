@@ -1,0 +1,6 @@
+description = 'ELKI - R-Tree Variants'
+dependencies {
+  compile project(':elki-index')
+  // Currently in elki-index: compile project(':elki-index-preprocessed')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}

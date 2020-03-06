@@ -1,0 +1,136 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "4.0.4"
+}
+
+description = 'ELKI - Single-jar Bundle'
+
+// Subprojects to not include:
+def bundleExclude = [ project.path, project.parent, ":elki-docutil" ]
+
+configurations {
+  doc { transitive false }
+}
+
+sourceSets { javadoc { java.srcDirs = ["$rootDir/elki/src/main/javadoc"] } }
+
+dependencies {
+  // Depend on all subprojects, except those listed
+  project.parent.subprojects.findAll { !bundleExclude.contains(it.path) }.each {
+    compile it
+    doc files(it.sourceSets.main.java.srcDirs)
+    testRuntime files(it.sourceSets.main.java.outputDir)
+  }
+  testCompile project(':elki-docutil')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}
+
+jar {
+  manifest {
+    // Expand ${project.version} in MANIFEST.MF
+    from("src/main/resources/META-INF/MANIFEST.MF") {
+      eachEntry { it.value = it.value.replace('${project.version}', project.version) }
+    }
+    attributes(
+      "Main-Class" : "de.lmu.ifi.dbs.elki.application.ELKILauncher",
+      "Class-Path": configurations.runtime.collect { "lib/"+it.getName() }.join(' ')
+    )
+  }
+  // Reorganize license information into a consistent folder
+  configurations.runtime.resolvedConfiguration.resolvedArtifacts.findAll
+  { !it.name.startsWith("elki") && !it.name.contains("xml-apis-ext") }.each { dep ->
+    from(zipTree(dep.file)) {
+      include("META-INF/LICENSE*")
+      include("META-INF/README*")
+      include("license/*")
+      eachFile { FileCopyDetails fcp ->
+        fcp.path = "license/"  + fcp.name.replaceAll(".txt\$", "")
+        fcp.path += "-" + dep.name.replaceAll("batik-.*", "batik")
+        fcp.path = fcp.path.replaceAll("\\.(dom.*|sax)-xml-apis", "-\$1")
+        fcp.path = fcp.path.replaceAll("\\.(sac\\.html)-xml-apis", ".\$1")
+      }
+    }
+    // zipTree(dep.file).findAll {
+    // it.path.toLowerCase().contains("license") || it.path.toLowerCase().contains("readme") || it.path.toLowerCase().contains("legal")
+    // }.each { logger.warn(""+dep.name+" "+it) }
+  }
+}
+
+sourceJar.from(configurations.doc)
+
+javadoc {
+  source configurations.doc
+  include "**/*.java"
+  include "**/*.html"
+  options.overview = "$rootDir/elki/src/main/javadoc/overview.html" as File
+}
+
+javadoc.dependsOn documentParameters
+javadoc.dependsOn documentReferences
+
+shadowJar {
+  dependsOn jar
+  from jar.outputs.files // To include the bundle jar with above notices!
+  configurations = [ project.configurations.runtime ]
+  destinationDir = project.parent.rootDir
+  classifier = null
+  manifest {
+    attributes("Class-Path" : "")
+  }
+  mergeServiceFiles {
+    path = "META-INF/services"
+  }
+  mergeServiceFiles {
+    path = "META-INF/elki"
+  }
+  // To merge apache notice files:
+  def notices = new com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer()
+  notices.projectName = "ELKI Data Mining Framework"
+  notices.organizationName = "ELKI Development Team"
+  notices.organizationURL = "https://elki-project.github.io/"
+  notices.inceptionYear = "2005"
+  notices.copyright = "ELKI Data Mining Framework\nCopyright ${year} ELKI Development Team (https://elki-project.github.io/)\nand distributed under the GNU Affero General Public License (AGPL-3+).\n"
+  transform notices
+  // We compile our own licensing information, as these tend to clash
+  exclude "META-INF/license/**"
+  exclude "META-INF/LICENSE*"
+  exclude "license/LICENSE.dom*.txt" // xml-apis
+  exclude "license/LICENSE.sax.txt" // xml-apis
+  exclude "license/LICENSE.sac.html" // xml-apis
+  exclude "license/README.dom*.txt" // xml-apis
+  exclude "license/README.sax.txt" // xml-apis
+  exclude "license/NOTICE" // xml-apis
+  exclude "META-INF/MANIFEST.SERIALIZER" // xml-apis
+  exclude "svm*class" // libsvm main classes
+  exclude "Applet*class" // libsvm applet
+  exclude "META-INF/maven/tw.edu.ntu.csie/*/*" // libsvm maven metadata
+  // reduce size of fastutil, for much smaller jar (and thus, faster startup)
+  exclude "it/unimi/dsi/fastutil/**/*Big*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*AVLTree*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*ArrayMap*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*Big*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Boolean*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Byte*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Char*" // fastutil
+  exclude "it/unimi/dsi/fastutil/**/*2Short*" // fastutil
+  exclude "it/unimi/dsi/fastutil/bytes/" // fastutil
+  exclude "it/unimi/dsi/fastutil/chars/" // fastutil
+  exclude "it/unimi/dsi/fastutil/booleans/" // fastutil
+  exclude "it/unimi/dsi/fastutil/shorts/" // fastutil
+}
+
+// Additional resources from main project
+task copyMoreDocResources(type: Copy) {
+  from("$rootDir/elki/src/main/javadoc") {
+    exclude "overview.html"
+  }
+  into "$project.buildDir/docs/javadoc"
+}
+javadoc.dependsOn copyMoreDocResources
+
+assemble.dependsOn shadowJar
+artifacts.archives shadowJar
+
+// bundle does not belong onto Maven
+tasks.withType(PublishToMavenRepository) {
+    enabled = false
+}

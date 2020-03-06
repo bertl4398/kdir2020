@@ -1,0 +1,5 @@
+description = 'ELKI - Locality Sensitive Hashing'
+dependencies {
+  compile project(':elki-index')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}

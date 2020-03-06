@@ -1,0 +1,9 @@
+Comment: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+
+Name: de/lmu/ifi/dbs/elki
+Comment: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+Implementation-Title: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+Implementation-Version: ${project.version}
+Implementation-Vendor: ELKI Development Team
+Implementation-URL: https://elki-project.github.io/
+

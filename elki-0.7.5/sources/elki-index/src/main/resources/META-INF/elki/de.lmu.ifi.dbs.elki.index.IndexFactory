@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix$Factory
+de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedSimilarityMatrix$Factory

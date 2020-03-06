@@ -1,0 +1,4 @@
+description = 'ELKI - Uncertain data handling'
+dependencies {
+  compile project(':elki-clustering')
+}

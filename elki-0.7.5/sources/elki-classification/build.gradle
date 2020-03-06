@@ -1,0 +1,5 @@
+description = 'ELKI - Classification Algorithms'
+dependencies {
+  compile project(':elki-core')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}

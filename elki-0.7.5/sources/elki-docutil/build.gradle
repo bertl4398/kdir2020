@@ -1,0 +1,4 @@
+description = 'ELKI - Documentation Utilities'
+dependencies {
+  compile project(':elki-core-util')
+}
